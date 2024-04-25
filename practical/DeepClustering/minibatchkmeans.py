@@ -1,6 +1,6 @@
 from sklearn.base import BaseEstimator
 import numpy as np
-from typing import Self, Union, Literal
+from typing import Union, Literal
 import torch
 
 class MiniBatchKMeans(BaseEstimator):
@@ -48,7 +48,7 @@ class MiniBatchKMeans(BaseEstimator):
         torch.manual_seed(self.random_state)
         
         
-    def fit(self, X: Union[torch.utils.data.DataLoader, np.ndarray]) -> Self:
+    def fit(self, X: Union[torch.utils.data.DataLoader, np.ndarray]):
         """Compute the centroids on X by batching the dataset and assign their labels according to the clustering result.
 
         Parameter
