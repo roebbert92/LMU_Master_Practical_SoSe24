@@ -70,13 +70,12 @@ class MiniBatchKMeans(BaseEstimator):
         self._assert_torch_data(X)
             
         # Compute initial cluster centers
-        match self.init_method:
-            case 'kmeans++':
-                self.cluster_centers_ = self._kmeanspp_centroids(X)
-            case 'random':
-                self.cluster_centers_ = self._random_centroids(X)
-            case _:
-                raise NotImplementedError(f"Unsupported centroid initialization method given: {self.init_method}")
+        if self.init_method == 'kmeans++':
+            self.cluster_centers_ = self._kmeanspp_centroids(X)
+        elif self.init_method == 'random':
+            self.cluster_centers_ = self._random_centroids(X)
+        else:
+            raise NotImplementedError(f"Unsupported centroid initialization method given: {self.init_method}")
         
         # Apply MiniBatch k-Means algorithm, starting with the initial centroids
         self.cluster_centers_ = self._minibatchkmeans(X, self.cluster_centers_)
@@ -106,13 +105,12 @@ class MiniBatchKMeans(BaseEstimator):
         Due to simplicity, numpy.random.choice has been selected as the main function for retrieving the random centroids.
         """        
 
-        match type(data):
-            case torch.utils.data.dataloader.DataLoader:
-                centers = data.dataset[np.random.choice(len(data.dataset), size=self.n_clusters, replace=False)] 
-            case np.ndarray:
-                centers = data[np.random.choice(len(data), size=self.n_clusters, replace=False)] 
-            case _:
-                raise NotImplementedError(f"Data of type {type(data)} is not implemented/supported.")
+        if isinstance(data, torch.utils.data.dataloader.DataLoader):
+            centers = data.dataset[np.random.choice(len(data.dataset), size=self.n_clusters, replace=False)] 
+        elif isinstance(data, np.ndarray):
+            centers = data[np.random.choice(len(data), size=self.n_clusters, replace=False)] 
+        else:
+            raise NotImplementedError(f"Data of type {type(data)} is not implemented/supported.")
         return torch.tensor(centers)
     
     def _kmeanspp_centroids(self, data: Union[torch.utils.data.DataLoader, np.ndarray]) -> torch.Tensor:
