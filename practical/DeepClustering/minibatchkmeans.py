@@ -23,6 +23,13 @@ class MiniBatchKMeans(BaseEstimator):
         random_state: int, default=0
             Determines random number generation for centroid initialization and random batch assignments.
         
+        init: str, default='kmeans++'
+            Method for initialization:
+            
+            'kmeans++': Selects inital cluster centroids using sampling based on the weighted distribution probability by contiously selecting the next centroid with the largest probability.
+            
+            'random': Randomly selects n_clusters points from the dataset as initial centroids.
+            
         Attributes
         ----------
         cluster_centers_: torch.Tensor
@@ -61,6 +68,8 @@ class MiniBatchKMeans(BaseEstimator):
         self: object
             Fitted estimator.
         """
+        
+        self._assert_dataset_type(X)
         
         if isinstance(X, np.ndarray):
             # Transform numpy.array dataset X to torch Object
@@ -113,7 +122,7 @@ class MiniBatchKMeans(BaseEstimator):
             raise NotImplementedError(f"Data of type {type(data)} is not implemented/supported.")
         return torch.tensor(centers)
     
-    def _kmeanspp_centroids(self, data: Union[torch.utils.data.DataLoader, np.ndarray]) -> torch.Tensor:
+    def _kmeanspp_centroids(self, data: torch.utils.data.DataLoader) -> torch.Tensor:
         """k-Means++ centroids computation, which uses a weighted probability method to calculate the optimal inital centroids.
         The main idea is to select initial centroids which are spread as far as possible to each other but remain close to other data points of potential clusters.
 
@@ -206,6 +215,17 @@ class MiniBatchKMeans(BaseEstimator):
         
         return torch.argmin(torch.cdist(torch.tensor(data.dataset), self.cluster_centers_, p=2.0), dim=1)
     
+    def _assert_dataset_type(self, data) -> None:
+        """Helper function to assert the given data set is of correct type.
+
+        Parameter
+        ---------
+        data: object
+            Dataset which is checked if its of appropiate type.
+        """
+        if not (isinstance(data, torch.utils.data.DataLoader) != isinstance(data, np.ndarray)):
+            raise NotImplementedError(f"Dataset if wrong type: {type(data)}")
+    
     def _assert_torch_data(self, data: torch.utils.data.DataLoader) -> None:
         """Helper function to assert that the necessary DataLoader values correspond to the class' settings.
 
@@ -221,6 +241,3 @@ class MiniBatchKMeans(BaseEstimator):
         
         if data.batch_size != self.batch_size:
             raise ValueError(f"The datasets batch size of {data.batch_size}")
-        
-        elif not isinstance(data.sampler, torch.utils.data.sampler.RandomSampler):
-            raise ValueError(f"Datasets sampler {data.sampler} is of wrong instance. Expected torch.utils.data.sampler.RandomSampler")
