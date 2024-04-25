@@ -1,11 +1,11 @@
 from sklearn.base import BaseEstimator
 import numpy as np
-from typing import Union, Literal
+from typing import Union
 import torch
 
 class MiniBatchKMeans(BaseEstimator):
     # Naming based on scikit-learn implementation: https://scikit-learn.org/stable/modules/generated/sklearn.cluster.MiniBatchKMeans.html
-    def __init__(self, n_clusters: int=3, max_iter: int=1000, batch_size: int=1024, random_state: int=0, init: Literal['kmeans++', 'random']='kmeans++') -> None:
+    def __init__(self, n_clusters: int=3, max_iter: int=1000, batch_size: int=1024, random_state: int=0, init: str='kmeans++') -> None:
         """MiniBatch k-Means Algorithm.
         
 
