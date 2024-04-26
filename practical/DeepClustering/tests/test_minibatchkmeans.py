@@ -22,6 +22,9 @@ torch.manual_seed(RANDOM_STATE)
 data = np.random.rand(TESTDATA_ROWS, TESTDATA_COLS)
 torch_data = torch.utils.data.DataLoader(dataset=data, batch_size=BATCH_SIZE, shuffle=True)
 
+large_data = np.random.rand(TESTDATA_ROWS*TESTDATA_ROWS, TESTDATA_COLS*TESTDATA_COLS)
+large_torch_data = torch.utils.data.DataLoader(dataset=large_data, batch_size=BATCH_SIZE, shuffle=True)
+
 def test_instantiate_miniBatchKMeans_object():
     # Initialize MiniBatch k-Means
     for INIT_METHOD in INIT_METHODS:
@@ -92,6 +95,16 @@ def test_minibatchkmeans_full_algorithm():
         
         # Assert if final label result is again of correct size and correct amount of clusters (0..N_CLUSTERS)
         assert mbkm.labels_.shape[0] == TESTDATA_ROWS # Length/Amount
+        assert torch.all(mbkm.labels_.unique() == torch.tensor([i for i in range(0, N_CLUSTERS)])) # 0..N_CLUSTERS
+        
+def test_minibatchkmeans_full_algorithm_large_dataset():
+    for INIT_METHOD in INIT_METHODS:
+        # Init object
+        mbkm = minibatchkmeans.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE, init=INIT_METHOD)
+        mbkm.fit(large_torch_data)
+        
+        # Assert if final label result is again of correct size and correct amount of clusters (0..N_CLUSTERS)
+        assert mbkm.labels_.shape[0] == TESTDATA_ROWS*TESTDATA_ROWS # Length/Amount
         assert torch.all(mbkm.labels_.unique() == torch.tensor([i for i in range(0, N_CLUSTERS)])) # 0..N_CLUSTERS
     
     

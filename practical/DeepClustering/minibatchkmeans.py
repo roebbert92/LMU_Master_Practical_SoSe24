@@ -111,7 +111,8 @@ class MiniBatchKMeans(BaseEstimator):
         
         Notes
         -----
-        Due to simplicity, numpy.random.choice has been selected as the main function for retrieving the random centroids.
+        Due to simplicity, numpy.random.choice has been selected as the main function for retrieving the random initial centroids.
+        With increasing k, the likelihood of choosing a point more than once with torch.randint() increases.
         """        
 
         if isinstance(data, torch.utils.data.dataloader.DataLoader):
@@ -177,8 +178,12 @@ class MiniBatchKMeans(BaseEstimator):
             
         Returns
         ------
-        
         torch.Tensor: Optimal cluster centers after a certain amount of iterations.
+        
+        Notes
+        -----
+        For optimization, a check on the average overal minimization value of the distance between batch and current state of centroids has been added.
+        If at any point the value increases compared to the previous value, the algorithm stops and returns the previous centroids as final centers.
         """
         
         # Initilize v
@@ -192,11 +197,21 @@ class MiniBatchKMeans(BaseEstimator):
             # torch.argmin returns the indexes of the closest center for each batch point
             batch_dist = torch.argmin(torch.cdist(batch, cluster_centers, p=2.0), dim=1)
             
+            # Additional Optimization: Stop as soon as the update rule increases the average minimization value
+            # Calculating the overall min distance vals for each data point to their respective cluster center
+            min_vals = torch.min(torch.cdist(torch.tensor(data.dataset), cluster_centers, p=2.0), dim=1).values
+            # And store the centroids with the according min vals
+            old_centers = cluster_centers
+            
             # Adjusting the cluster center
             for i in np.unique(batch_dist):
                 v[i] += len(np.where(batch_dist == i)) # Add the occurences count to the overall count
-                eta = 1.0 / v[i] # Generate eta
+                eta = 1.0 / v[i] # Calculate eta
                 cluster_centers[i] = (1-eta)*cluster_centers[i] + eta*torch.mean(batch[np.where(batch_dist == i)], dim=0) # Adjust centroid
+            
+            if torch.mean(min_vals) < torch.mean(torch.min(torch.cdist(torch.tensor(data.dataset), cluster_centers, p=2.0), dim=1).values):
+                return old_centers
+            
                 
         return cluster_centers
     
