@@ -28,9 +28,9 @@ large_torch_data = torch.utils.data.DataLoader(dataset=large_data, batch_size=BA
 def test_instantiate_miniBatchKMeans_object():
     # Initialize MiniBatch k-Means
     for INIT_METHOD in INIT_METHODS:
-        mbkm = minibatchkmeans.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE, init=INIT_METHOD)
+        mbkm = minibatchkmeans_schmiedel.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE, init=INIT_METHOD)
         
-        assert isinstance(mbkm, minibatchkmeans.MiniBatchKMeans)
+        assert isinstance(mbkm, minibatchkmeans_schmiedel.MiniBatchKMeans)
         assert mbkm.n_clusters == N_CLUSTERS
         assert mbkm.max_iter == MAX_ITER
         assert mbkm.batch_size == BATCH_SIZE
@@ -44,16 +44,16 @@ def test_random_initial_centroids():
     test_data = data[np.random.choice(data.shape[0], N_CLUSTERS, replace=False)]
     
     # Assert for numpy array
-    mbkm_class = minibatchkmeans.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE)
+    mbkm_class = minibatchkmeans_schmiedel.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE)
     assert np.all(test_data == np.array(mbkm_class._random_centroids(data).tolist()))
 
     # Assert for torch object
-    mbkm_class = minibatchkmeans.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE)
+    mbkm_class = minibatchkmeans_schmiedel.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE)
     assert torch.all(torch.tensor(test_data) == mbkm_class._random_centroids(torch_data))
         
 def test_kmeanspp_initial_centroids():
     # Test if the output is of correct size
-    mbkm_class = minibatchkmeans.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE)
+    mbkm_class = minibatchkmeans_schmiedel.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE)
     cluster_centers = mbkm_class._kmeanspp_centroids(torch_data)
     assert torch.Size([N_CLUSTERS, TESTDATA_COLS]) == cluster_centers.size()
     
@@ -62,7 +62,7 @@ def test_minibatchkmeans_algorithm_result_size():
     
     # Init object
     for INIT_METHOD in INIT_METHODS:
-        mbkm = minibatchkmeans.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE, init=INIT_METHOD)
+        mbkm = minibatchkmeans_schmiedel.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE, init=INIT_METHOD)
         cluster_centers = mbkm._random_centroids(torch_data)
         
         # Assert if the result is of the expected size
@@ -71,7 +71,7 @@ def test_minibatchkmeans_algorithm_result_size():
 def test_assigning_labels():
     for INIT_METHOD in INIT_METHODS:
         # Initialize a new MiniBatch k-Means Object
-        mbkm = minibatchkmeans.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE, init=INIT_METHOD)
+        mbkm = minibatchkmeans_schmiedel.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE, init=INIT_METHOD)
         
         # Retrieve the initial random cluster centers
         cluster_centers_initial = mbkm._random_centroids(torch_data)
@@ -90,7 +90,7 @@ def test_assigning_labels():
 def test_minibatchkmeans_full_algorithm():
     for INIT_METHOD in INIT_METHODS:
         # Init object
-        mbkm = minibatchkmeans.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE, init=INIT_METHOD)
+        mbkm = minibatchkmeans_schmiedel.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE, init=INIT_METHOD)
         mbkm.fit(torch_data)
         
         # Assert if final label result is again of correct size and correct amount of clusters (0..N_CLUSTERS)
@@ -100,7 +100,7 @@ def test_minibatchkmeans_full_algorithm():
 def test_minibatchkmeans_full_algorithm_large_dataset():
     for INIT_METHOD in INIT_METHODS:
         # Init object
-        mbkm = minibatchkmeans.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE, init=INIT_METHOD)
+        mbkm = minibatchkmeans_schmiedel.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=MAX_ITER, batch_size=BATCH_SIZE, random_state=RANDOM_STATE, init=INIT_METHOD)
         mbkm.fit(large_torch_data)
         
         # Assert if final label result is again of correct size and correct amount of clusters (0..N_CLUSTERS)
@@ -111,27 +111,27 @@ def test_minibatchkmeans_full_algorithm_large_dataset():
 # Failing tests, as expected
 def test_wrong_dataset_type():
     with pytest.raises(NotImplementedError):
-        mbkm = minibatchkmeans.MiniBatchKMeans()
+        mbkm = minibatchkmeans_schmiedel.MiniBatchKMeans()
         mbkm.fit([])
         
 def test_wrong_batch_size():
     with pytest.raises(ValueError):
-        mbkm = minibatchkmeans.MiniBatchKMeans()
+        mbkm = minibatchkmeans_schmiedel.MiniBatchKMeans()
         wrong_torch_data = torch.utils.data.DataLoader(dataset=data, batch_size=BATCH_SIZE*2, shuffle=True)
         mbkm.fit(wrong_torch_data)
 
 def test_wrong_sampler():
     with pytest.raises(ValueError):
-        mbkm = minibatchkmeans.MiniBatchKMeans()
+        mbkm = minibatchkmeans_schmiedel.MiniBatchKMeans()
         wrong_torch_data = torch.utils.data.DataLoader(dataset=data, batch_size=BATCH_SIZE, sampler=torch.utils.data.sampler.SequentialSampler)
         mbkm.fit(wrong_torch_data)
         
 def test_false_centroid_init_method():
     with pytest.raises(NotImplementedError):
-        mbkm = minibatchkmeans.MiniBatchKMeans(init='')
+        mbkm = minibatchkmeans_schmiedel.MiniBatchKMeans(init='')
         mbkm.fit(data)
 
 def test_false_data_type_initial_random_centroids():
     with pytest.raises(NotImplementedError):
-        mbkm = minibatchkmeans.MiniBatchKMeans()
+        mbkm = minibatchkmeans_schmiedel.MiniBatchKMeans()
         mbkm._random_centroids([])
