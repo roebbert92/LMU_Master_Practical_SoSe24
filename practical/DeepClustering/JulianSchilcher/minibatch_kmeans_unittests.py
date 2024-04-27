@@ -7,7 +7,7 @@ from sklearn.metrics import normalized_mutual_info_score
 
 class TestMinibatchKmeans(unittest.TestCase):
     """
-    all test methods start with _test, the other (helper) methods will bes skipped
+    all test methods start with _test, the other (helper) methods will bes skipped by executing the tests
     """
     def test_get_minibatch(self):
         kmeans = MinibatchKmeans(3, 50, pytorch_optimization=False)
@@ -35,13 +35,17 @@ class TestMinibatchKmeans(unittest.TestCase):
         self.assertTrue(np.equal(np.unique(y_pred), np.array([0,1,2,3])).all().item())
 
     def helper_run_simulation(self, pytorch_optimization):
-        X, y_true = make_blobs(n_samples=300, centers=4, cluster_std=0.20, random_state=0)
-        kmeans = MinibatchKmeans(4, 50, pytorch_optimization=pytorch_optimization)
+        X, y_true = make_blobs(n_samples=300, centers=4, cluster_std=0.40, random_state=0)
+        kmeans = MinibatchKmeans(4, 30, pytorch_optimization=pytorch_optimization)
         # mutual information should have high value averaged over multiple runs (depending on quality of random initialisation)
         nmi = 0
         for i in range(50):
             y_pred = kmeans.fit(X)
             nmi += normalized_mutual_info_score(y_true, y_pred)
+        if pytorch_optimization:
+            print("Performance Pytorch Optim: ", nmi/50)
+        else:
+            print("Performance Paper Optim: ", nmi/50)
         return nmi/50 > 0.8
 
     def test_fit_outputsemantics(self):
