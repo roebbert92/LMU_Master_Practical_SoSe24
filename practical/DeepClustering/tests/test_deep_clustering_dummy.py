@@ -1,4 +1,4 @@
-from practical.DeepClustering import hello_world
+from practical.DeepClustering.deep_clustering_dummy import hello_world
 
 
 def test_hello_world_clustering():
