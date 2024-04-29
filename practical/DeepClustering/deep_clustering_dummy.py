@@ -5,7 +5,7 @@ def hello_world(string: str) -> str:
     return "Hello " + string
 
 
-def minibatch_k_means(k: int, size: int, iterations: int, X):
+def minibatch_k_means_khang_van(k: int, size: int, iterations: int, X):
     v = torch.zeros(k)
     centroids = X[torch.randint(0, len(X), (k,))]
 
