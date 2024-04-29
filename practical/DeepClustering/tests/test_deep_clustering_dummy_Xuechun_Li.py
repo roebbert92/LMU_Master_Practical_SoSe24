@@ -1,4 +1,4 @@
-from practical.DeepClustering import MiniBatchKmeans
+from practical.DeepClustering.deep_clustering_dummy_Xuechun_Li import MiniBatchKmeans
 import torch
 
 # generate the input, 50 data poing with 10 features for each data point
