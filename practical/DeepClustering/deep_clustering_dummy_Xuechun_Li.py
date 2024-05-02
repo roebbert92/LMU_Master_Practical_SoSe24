@@ -1,9 +1,11 @@
 import torch
 class MiniBatchKmeans:
-    def __init__(self, n_clusters,batch_size,n_iter):
+    def __init__(self, n_clusters,batch_size,n_iter, tol):
         self.n_clusters = n_clusters
         self.batch_size = batch_size
         self.n_iter = n_iter
+        self.tol = tol
+        self.centers = None
     def forward(self, input):
         samples, features = input.shape
         # initialize centroid for each cluster
@@ -24,4 +26,14 @@ class MiniBatchKmeans:
                 v[c] +=1
                 lr = 1/v[c]
                 n_centroids[c] = (1-lr)*n_centroids[c]+lr*x
+                self.centers = n_centroids
+            if(self._check_convergence(input)):
+                break
         return n_centroids
+    
+    def _check_convergence(self, data):
+        # compute eulidean
+        dis = torch.cdist(data,self.centers,p=2)
+        min_distances = torch.min(dis, dim=1)[0]
+        avg_distance = torch.mean(min_distances)
+        return bool(avg_distance<self.tol)
