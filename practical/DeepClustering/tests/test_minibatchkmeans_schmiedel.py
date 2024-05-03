@@ -106,6 +106,15 @@ def test_minibatchkmeans_full_algorithm_large_dataset():
         # Assert if final label result is again of correct size and correct amount of clusters (0..N_CLUSTERS)
         assert mbkm.labels_.shape[0] == TESTDATA_ROWS*TESTDATA_ROWS # Length/Amount
         assert torch.all(mbkm.labels_.unique() == torch.tensor([i for i in range(0, N_CLUSTERS)])) # 0..N_CLUSTERS
+        
+def test_minibatchkmeans_full_algorithm_large_dataset_small_iteration():
+    for INIT_METHOD in INIT_METHODS:
+        mbkm = minibatchkmeans_schmiedel.MiniBatchKMeans(n_clusters=N_CLUSTERS, max_iter=2, batch_size=BATCH_SIZE, random_state=RANDOM_STATE, init=INIT_METHOD)
+        mbkm.fit(large_data)
+        
+        # Assert if final label result is again of correct size and correct amount of clusters (0..N_CLUSTERS)
+        assert mbkm.labels_.shape[0] == TESTDATA_ROWS*TESTDATA_ROWS # Length/Amount
+        assert torch.all(mbkm.labels_.unique() == torch.tensor([i for i in range(0, N_CLUSTERS)])) # 0..N_CLUSTERS
     
     
 # Failing tests, as expected
