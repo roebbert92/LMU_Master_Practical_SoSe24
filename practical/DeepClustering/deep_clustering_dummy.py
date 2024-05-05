@@ -6,7 +6,7 @@ def hello_world(string: str) -> str:
 
 
 class MiniBatchKMeans:
-    def __init__(self, k: int, batch_size: int, iterations: int):
+    def __init__(self, k: int, batch_size: int, iterations: int, random_state: int):
         if not isinstance(k, int):
             raise TypeError("k should be of type integer")
         if not isinstance(batch_size, int):
@@ -19,6 +19,8 @@ class MiniBatchKMeans:
             raise ValueError("batch size must be bigger than 0")
         if iterations < 1:
             raise ValueError("iteration must be bigger than 0")
+        if random_state is not None:
+            torch.manual_seed(random_state)
 
         self.k = k
         self.batch_size = batch_size
@@ -30,11 +32,14 @@ class MiniBatchKMeans:
     def fit(self, x: torch.Tensor) -> torch.Tensor:
         center_counts = torch.zeros(self.k)
         centroids = x[torch.randint(0, len(x), (self.k,))]
+        print(centroids)
 
         for _ in range(self.iterations):
             batch_index = torch.randint(0, len(x), (self.batch_size,))
             batch = x[batch_index]
+            print(batch)
             distance = self.distance(batch, centroids)
+            print(distance)
 
             for index, point in enumerate(batch):
                 center = distance[index]
