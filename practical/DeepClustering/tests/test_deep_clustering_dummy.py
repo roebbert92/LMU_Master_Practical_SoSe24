@@ -1,5 +1,5 @@
 from practical.DeepClustering.deep_clustering_dummy import hello_world, \
-    minibatch_k_means_khang_van as minibatch_k_means, MiniBatchKMeans
+    MiniBatchKMeans
 from sklearn.cluster import KMeans
 import torch
 
