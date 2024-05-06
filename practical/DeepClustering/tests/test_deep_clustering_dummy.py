@@ -13,7 +13,7 @@ def test_minibatch_k_means():
     data = torch.rand(20, 2)
     cluster = 3
 
-    minibatch_k_means = MiniBatchKMeans(cluster, 10, 10, 7)
+    minibatch_k_means = MiniBatchKMeansVan(cluster, 10, 10, 7)
     minibatch_k_means_centers = minibatch_k_means.fit(data)
 
     sklearn_k_means = KMeans(cluster, random_state=7)
@@ -41,7 +41,7 @@ def test_minibatch_k_means_distance():
 
     distance = torch.tensor([1, 1, 1, 1, 1, 1, 2, 1, 0, 1])
 
-    kmeans = MiniBatchKMeans(3, 10, 10, 7)
+    kmeans = MiniBatchKMeansVan(3, 10, 10, 7)
     kmeans_distance = kmeans.distance(batch, centroids)
 
     assert torch.equal(distance, kmeans_distance)
