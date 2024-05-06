@@ -19,7 +19,7 @@ def test_minibatch_kmeans():
     pred_labels = sk_kmeans.fit_predict(data)
     print("sklearn train_acc: ", adjusted_rand_score(labels, pred_labels))
     print("duration: ", time.perf_counter() - start_time)
-    test, test_labels = load_fmnist("test")
+    test, test_labels = load_fmnist(return_X_y=True)
     print(
         "my test acc: ",
         adjusted_rand_score(test_labels, kmeans.predict(test)),
