@@ -8,7 +8,7 @@ import time
 def test_minibatch_kmeans():
     data, labels = load_wine(return_X_y=True)
     start_time = time.perf_counter()
-    kmeans = MiniBatchKMeans(10, 1024, 20, device="cuda")
+    kmeans = MiniBatchKMeans(10, 1024, 20, device="cpu")
     pred_labels = kmeans.fit(data).predict(data)
     print("my train acc: ", adjusted_rand_score(labels, pred_labels))
     print("duration: ", time.perf_counter() - start_time)
