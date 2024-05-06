@@ -1,5 +1,3 @@
-from practical.DeepClustering.deep_clustering_dummy import hello_world
-from practical.DeepClustering.deep_clustering_dummy import MiniBatchKMeans
+from .deep_clustering_dummy import hello_world, MiniBatchKMeansVan
 
-
-__all__ = ["hello_world", "MiniBatchKMeans"]
+__all__ = ["hello_world", "MiniBatchKMeansVan"]

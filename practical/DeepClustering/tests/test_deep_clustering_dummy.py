@@ -1,7 +1,7 @@
-from practical.DeepClustering.deep_clustering_dummy import hello_world, \
-    MiniBatchKMeans
+from practical.DeepClustering.deep_clustering_dummy import hello_world, MiniBatchKMeansVan
 from sklearn.cluster import KMeans
 import torch
+
 
 
 def test_hello_world_clustering():
