@@ -5,7 +5,7 @@ def hello_world(string: str) -> str:
     return "Hello " + string
 
 
-class MiniBatchKMeans:
+class MiniBatchKMeansVan:
     def __init__(self, k: int, batch_size: int, iterations: int, random_state: int):
         if not isinstance(k, int):
             raise TypeError("k should be of type integer")
